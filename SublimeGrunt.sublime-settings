@@ -1,0 +1,5 @@
+{
+    "exec_args": {
+        "path": "/bin:/usr/bin:/usr/local/bin:/home/tim/Applications/node/bin"
+    }
+}
