@@ -19,6 +19,8 @@ basicTasks = [
 rFiles = re.compile(r'loadNpmTasks\(\'(.*)\'\)', re.M | re.I)
 rSingle = re.compile(r'registerTask.*\(.*\'(.*)\'.*,.*\'(.*)\'.*\)', re.M | re.I)
 rMulti = re.compile(r'registerMultiTask.*\(.*\'(.*)\'.*,.*\'(.*)\'.*,', re.M | re.I)
+rFunc = re.compile(r'registerMultiTask.*\(.*\'(.*)\'.*,.*\'(.*)\'.*,.*function\((.*)\).*{', re.M | re.I)
+
 
 class GruntConsole(object):
     def __init__(self, window):
@@ -54,17 +56,27 @@ class GruntfileParser(object):
         try:
             f = open(file, "r")
             for line in f:
-                match = rSingle.search(line)
-                if match:
-                    l = list(match.groups())
+                # Single Tasks
+                matchSingle = rSingle.search(line)
+                matchFunc = rFunc.search(line)
+                matchMulti = rMulti.search(line)
+                if matchSingle:
+                    l = list(matchSingle.groups())
                     l.append(source)
                     tasks.append(l)
                     print l
-                match = rMulti.search(line)
-                if match:
-                    l = list(match.groups())
+                # Function Tasks
+                elif matchFunc:
+                    l = list(matchFunc.groups())
                     l.append(source)
                     l[0] = l[0] + ' *'
+                    tasks.append(l)
+                    print l
+                # Multi Tasks
+                elif matchMulti:
+                    l = list(matchMulti.groups())
+                    l.append(source)
+                    l[0] = l[0] + ' **'
                     tasks.append(l)
                     print l
                 #match = rMulti.search(line)
