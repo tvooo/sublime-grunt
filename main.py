@@ -6,16 +6,19 @@ import sys
 #import subprocess
 
 basicTasks = [
-    ["lint", "Validate files with JSHint."],
-    ["qunit", "Run QUnit unit tests in a headless PhantomJS instance."],
-    ["min", "Minify files with UglifyJS."],
-    ["watch", "Run predefined tasks whenever watched files change."],
-    ["server", "Start a static web server."],
-    ["concat", "Concatenate files."],
-    ["test", "Run unit tests with nodeunit."],
-    ["init", "Generate project scaffolding from a predefined template."]
+    ["lint", "Validate files with JSHint.", "Grunt default tasks"],
+    ["qunit", "Run QUnit unit tests in a headless PhantomJS instance.", "Grunt default tasks"],
+    ["min", "Minify files with UglifyJS.", "Grunt default tasks"],
+    ["watch", "Run predefined tasks whenever watched files change.", "Grunt default tasks"],
+    ["server", "Start a static web server.", "Grunt default tasks"],
+    ["concat", "Concatenate files.", "Grunt default tasks"],
+    ["test", "Run unit tests with nodeunit.", "Grunt default tasks"],
+    ["init", "Generate project scaffolding from a predefined template.", "Grunt default tasks"]
 ]
 
+rFiles = re.compile(r'loadNpmTasks\(\'(.*)\'\)', re.M | re.I)
+rSingle = re.compile(r'registerTask.*\(.*\'(.*)\'.*,.*\'(.*)\'.*\)', re.M | re.I)
+rMulti = re.compile(r'registerMultiTask.*\(.*\'(.*)\'.*,.*\'(.*)\'.*,', re.M | re.I)
 
 class GruntConsole(object):
     def __init__(self, window):
@@ -46,28 +49,70 @@ class GruntfileParser(object):
         else:
             sublime.error_message("Gruntfile not found!")
 
-    def choose_file(self, file):
-        self.tasks = []
+    def extractTasks(self, file, source):
+        tasks = []
         try:
-            f = open(self.grunt_files[0], "r")
-            #s = f.read()
-            regex = re.compile(r'registerTask\(\'(.*)\', \'(.*)\'\)', re.M | re.I)
+            f = open(file, "r")
             for line in f:
-                match = regex.search(line)
+                match = rSingle.search(line)
                 if match:
-                    self.tasks.append(list(match.groups()))
-                    print list(match.groups())
-            self.tasks = self.tasks + basicTasks
+                    l = list(match.groups())
+                    l.append(source)
+                    tasks.append(l)
+                    print l
+                match = rMulti.search(line)
+                if match:
+                    l = list(match.groups())
+                    l.append(source)
+                    l[0] = l[0] + ' *'
+                    tasks.append(l)
+                    print l
+                #match = rMulti.search(line)
+                #if match:
+                #    self.tasks.append(list(match.groups()))
+                #    print list(match.groups())
+            f.close()
         except IOError:
-            sys.stderr.write("[myScript] - Error: Could not open %s\n" % (self.grunt_files[0]))
+            sys.stderr.write("[sublime-grunt] - Error: Could not open %s\n" % (file))
             sys.exit(-1)
+        except:
+            sys.stderr.write("[sublime-grunt] - Error =( \n")
+            sys.exit(-1)
+        return tasks
 
+    def extractNpmFiles(self, file):
+        files = []
+        try:
+            f = open(file, "r")
+            for line in f:
+                match = rFiles.search(line)
+                if match:
+                    files.append(match.groups()[0])
+        except IOError:
+            sys.stderr.write("[sublime-grunt] - Error: Could not open %s\n" % (file))
+            sys.exit(-1)
+        finally:
+            f.close()
+        return files
+
+    def choose_file(self, file):
+        self.wd = os.path.dirname(self.grunt_files[file])
+        npmTasks = []
+
+        files = self.extractNpmFiles(self.grunt_files[file])
+        for f in files:
+            taskFiles = [tf for tf in os.listdir(os.path.join(self.wd, "node_modules", f, "tasks")) if tf.lower().endswith('.js')]
+            for tf in taskFiles:
+                npmTasks = npmTasks + self.extractTasks(os.path.join(self.wd, "node_modules", f, "tasks", tf), "Module: %s" % f)
+        self.tasks = self.extractTasks(self.grunt_files[file], "grunt.js") + npmTasks + basicTasks
         self.window.show_quick_panel(self.tasks, self.on_done)
+        #self.window.show_quick_panel(files, self.on_done)
 
     def on_done(self, task):
-        exec_args = settings().get('exec_args')
-        exec_args.update({'cmd': u"grunt --no-color " + self.tasks[task][0], 'shell': True, 'working_dir': self.folders[0]})
-        self.window.run_command("exec", exec_args)
+        if task > -1:
+            exec_args = settings().get('exec_args')
+            exec_args.update({'cmd': u"grunt --no-color " + self.tasks[task][0], 'shell': True, 'working_dir': self.folders[0]})
+            self.window.run_command("exec", exec_args)
 
 
 def settings():
