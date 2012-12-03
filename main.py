@@ -43,6 +43,8 @@ class GruntfileParser(object):
             self.folders.append(f)
             if os.path.exists(os.path.join(f, "grunt.js")):
                 self.grunt_files.append(os.path.join(f, "grunt.js"))
+            elif os.path.exists(os.path.join(f, "Gruntfile.js")):
+                self.grunt_files.append(os.path.join(f, "Gruntfile.js"))
         if len(self.grunt_files) > 0:
             if len(self.grunt_files) == 1:
                 self.choose_file(0)
@@ -116,7 +118,7 @@ class GruntfileParser(object):
             taskFiles = [tf for tf in os.listdir(os.path.join(self.wd, "node_modules", f, "tasks")) if tf.lower().endswith('.js')]
             for tf in taskFiles:
                 npmTasks = npmTasks + self.extractTasks(os.path.join(self.wd, "node_modules", f, "tasks", tf), "Module: %s" % f)
-        self.tasks = self.extractTasks(self.grunt_files[file], "grunt.js") + npmTasks + basicTasks
+        self.tasks = self.extractTasks(self.grunt_files[file], self.grunt_files[file]) + npmTasks + basicTasks
         self.window.show_quick_panel(self.tasks, self.on_done)
         #self.window.show_quick_panel(files, self.on_done)
 
