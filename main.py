@@ -66,25 +66,25 @@ class GruntfileParser(object):
                     l = list(matchSingle.groups())
                     l.append(source)
                     tasks.append(l)
-                    print l
+                    print(l)
                 # Function Tasks
                 elif matchFunc:
                     l = list(matchFunc.groups())
                     l.append(source)
                     l[0] = l[0] + ' *'
                     tasks.append(l)
-                    print l
+                    print(l)
                 # Multi Tasks
                 elif matchMulti:
                     l = list(matchMulti.groups())
                     l.append(source)
                     l[0] = l[0] + ' **'
                     tasks.append(l)
-                    print l
+                    print(l)
                 #match = rMulti.search(line)
                 #if match:
                 #    self.tasks.append(list(match.groups()))
-                #    print list(match.groups())
+                #    print(list(match.groups()))
             f.close()
         except IOError:
             sys.stderr.write("[sublime-grunt] - Error: Could not open %s\n" % (file))
