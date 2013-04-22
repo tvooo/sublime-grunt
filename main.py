@@ -5,15 +5,15 @@ import re
 import sys
 #import subprocess
 
-basicTasks = [
-    ["lint", "Validate files with JSHint.", "Grunt default tasks"],
-    ["qunit", "Run QUnit unit tests in a headless PhantomJS instance.", "Grunt default tasks"],
-    ["min", "Minify files with UglifyJS.", "Grunt default tasks"],
-    ["watch", "Run predefined tasks whenever watched files change.", "Grunt default tasks"],
-    ["server", "Start a static web server.", "Grunt default tasks"],
-    ["concat", "Concatenate files.", "Grunt default tasks"],
-    ["test", "Run unit tests with nodeunit.", "Grunt default tasks"],
-    ["init", "Generate project scaffolding from a predefined template.", "Grunt default tasks"]
+legacyBuiltinTasks = [
+    ["lint", "Validate files with JSHint."],
+    ["qunit", "Run QUnit unit tests in a headless PhantomJS instance."],
+    ["min", "Minify files with UglifyJS."],
+    ["watch", "Run predefined tasks whenever watched files change."],
+    ["server", "Start a static web server."],
+    ["concat", "Concatenate files."],
+    ["test", "Run unit tests with nodeunit."],
+    ["init", "Generate project scaffolding from a predefined template."]
 ]
 
 rFiles = re.compile(r'loadNpmTasks\(\'(.*)\'\)', re.M | re.I)
@@ -118,7 +118,7 @@ class GruntfileParser(object):
             taskFiles = [tf for tf in os.listdir(os.path.join(self.wd, "node_modules", f, "tasks")) if tf.lower().endswith('.js')]
             for tf in taskFiles:
                 npmTasks = npmTasks + self.extractTasks(os.path.join(self.wd, "node_modules", f, "tasks", tf), "Module: %s" % f)
-        self.tasks = self.extractTasks(self.grunt_files[file], self.grunt_files[file]) + npmTasks + basicTasks
+        self.tasks = self.extractTasks(self.grunt_files[file], self.grunt_files[file]) + npmTasks + legacyBuiltinTasks
         self.window.show_quick_panel(self.tasks, self.on_done)
         #self.window.show_quick_panel(files, self.on_done)
 
