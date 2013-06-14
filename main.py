@@ -22,7 +22,7 @@ class GruntRunner(object):
         args = 'grunt --no-color --tasks "' + package_path + '" expose'
         path_env = settings().get('exec_args').get('path')
 
-        p = subprocess.Popen( args, stdout=subprocess.PIPE, env={"PATH": env_path}, cwd=self.wd, shell=True)
+        p = subprocess.Popen( args, stdout=subprocess.PIPE, env={"PATH": path_env}, cwd=self.wd, shell=True)
         s = p.communicate()[0]
         t = tasksJSON.search(s)
 
