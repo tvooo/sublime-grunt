@@ -2,5 +2,9 @@
     {
         "caption": "Grunt",
         "command": "grunt"
+    },
+    {
+        "caption": "Grunt: Kill Running Tasks",
+        "command": "grunt_kill"
     }
 ]
