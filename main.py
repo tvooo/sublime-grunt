@@ -6,6 +6,8 @@ import sys
 import subprocess
 import json
 
+package_name = "Grunt"
+
 tasksJSON = re.compile(r'EXPOSE_BEGIN(.*)EXPOSE_END', re.M | re.I | re.DOTALL)
 
 class GruntRunner(object):
@@ -16,10 +18,11 @@ class GruntRunner(object):
     def listTasks(self):
         tasks = []
         path = settings().get('exec_args').get('path')
-        package_path = os.path.join(sublime.packages_path(), "sublime-grunt")
+        package_path = os.path.join(sublime.packages_path(), package_name)
         args = 'grunt --no-color --tasks "' + package_path + '" expose'
+        path_env = settings().get('exec_args').get('path')
 
-        p = subprocess.Popen( args, stdout=subprocess.PIPE, env={"PATH": "/usr/local/bin"}, cwd=self.wd, shell=True)
+        p = subprocess.Popen( args, stdout=subprocess.PIPE, env={"PATH": env_path}, cwd=self.wd, shell=True)
         s = p.communicate()[0]
         t = tasksJSON.search(s)
 
