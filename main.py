@@ -24,7 +24,7 @@ class GruntRunner(object):
 
         p = subprocess.Popen( args, stdout=subprocess.PIPE, env={"PATH": path_env}, cwd=self.wd, shell=True)
         s = p.communicate()[0]
-        t = tasksJSON.search(s)
+        t = tasksJSON.search(s.decode('utf8'))
 
         js = json.loads(t.groups()[0])
         for k in js.keys():
