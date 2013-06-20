@@ -20,9 +20,8 @@ class GruntRunner(object):
         path = settings().get('exec_args').get('path')
         package_path = os.path.join(sublime.packages_path(), package_name)
         args = 'grunt --no-color --tasks "' + package_path + '" expose'
-        path_env = settings().get('exec_args').get('path')
 
-        p = subprocess.Popen( args, stdout=subprocess.PIPE, env={"PATH": path_env}, cwd=self.wd, shell=True)
+        p = subprocess.Popen( args, stdout=subprocess.PIPE, env={"PATH": path}, cwd=self.wd, shell=True)
         s = p.communicate()[0]
         t = tasksJSON.search(s.decode('utf8'))
 
@@ -40,13 +39,15 @@ class GruntRunner(object):
             self.folders.append(f)
             if os.path.exists(os.path.join(f, "Gruntfile.js")):
                 self.grunt_files.append(os.path.join(f, "Gruntfile.js"))
+            elif os.path.exists(os.path.join(f, "Gruntfile.coffee")):
+                self.grunt_files.append(os.path.join(f, "Gruntfile.coffee"))
         if len(self.grunt_files) > 0:
             if len(self.grunt_files) == 1:
                 self.choose_file(0)
             else:
                 self.window.show_quick_panel(self.grunt_files, self.choose_file)
         else:
-            sublime.error_message("Gruntfile.js not found!")
+            sublime.error_message("Gruntfile.js or Gruntfile.coffee not found!")
 
     def choose_file(self, file):
         self.wd = os.path.dirname(self.grunt_files[file])
@@ -64,10 +65,8 @@ def settings():
 
 class GruntCommand(sublime_plugin.WindowCommand):
     def run(self):
-        #self.window = self.view.window()
         GruntRunner(self.window)
 
 class GruntKillCommand(sublime_plugin.WindowCommand):
     def run(self):
-        #self.window = self.view.window()
         self.window.run_command("exec", {"kill": True})

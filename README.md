@@ -30,5 +30,6 @@ variable.
 
 Thanks for some contributions go to
 
-* @antonellopasella
-* @structAnkit
+* [antonellopasella](https://github.com/antonellopasella)
+* [structAnkit](https://github.com/structAnkit)
+* [lavrton](https://github.com/lavrton)
