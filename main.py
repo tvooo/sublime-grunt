@@ -17,6 +17,7 @@ class GruntRunner(object):
 
     def listTasks(self):
         tasks = []
+        sorted_tasks = []
         path = settings().get('exec_args').get('path')
         package_path = os.path.join(sublime.packages_path(), package_name)
         args = 'grunt --no-color --tasks "' + package_path + '" expose'
@@ -29,6 +30,8 @@ class GruntRunner(object):
         for k in js.keys():
             task = js[k]
             tasks.append([k, task['info'], task['meta']['info']])
+
+        sorted_tasks = sorted(tasks, key=lambda task: task)
 
         return tasks
 

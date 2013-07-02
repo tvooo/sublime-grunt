@@ -10,7 +10,7 @@ and choose the "Grunt" command.
 
 The plugin expects to find a Grunt file (`Gruntfile.js`) in an open folder.
 It displays a list of available Grunt tasks out of this Grunt file.
-If it finds more than one, it first provides a list for selection.
+If it finds more than one, it first provides a sorted list for selection.
 
 As of version 0.2, there is also a command to kill running tasks, for example
 `watch` tasks.
