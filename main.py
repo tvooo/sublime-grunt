@@ -31,7 +31,8 @@ class GruntRunner(object):
                 self.write_error("SublimeGrunt: JSON is malformed\n\n" + json_match.groups()[0])
                 sublime.error_message("Could not read available tasks\n")
             else:
-                return [[name, task['info'], task['meta']['info']] for name, task in json_result.items()]
+                tasks = [[name, task['info'], task['meta']['info']] for name, task in json_result.items()]
+                return sorted(tasks, key=lambda task: task)
         else:
             self.write_error("SublimeGrunt: Could not expose available tasks\n\n" + stdout)
             sublime.error_message("Could not expose available tasks\n")
