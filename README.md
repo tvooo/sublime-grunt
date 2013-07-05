@@ -9,8 +9,8 @@ Open the command palette using Ctrl+Shift+P (or Cmd+Shift+P on Mac, respectively
 and choose the "Grunt" command.
 
 The plugin expects to find a Grunt file (`Gruntfile.js`) in an open folder.
-It displays a list of available Grunt tasks out of this Grunt file.
-If it finds more than one, it first provides a sorted list for selection.
+It displays a sorted list of available Grunt tasks out of this Grunt file.
+If it finds more than one, it first provides a list for selection.
 
 As of version 0.2, there is also a command to kill running tasks, for example
 `watch` tasks.
@@ -33,3 +33,4 @@ Thanks for some contributions go to
 * [antonellopasella](https://github.com/antonellopasella)
 * [structAnkit](https://github.com/structAnkit)
 * [lavrton](https://github.com/lavrton)
+* [adamcbrewer](https://github.com/adamcbrewer)
