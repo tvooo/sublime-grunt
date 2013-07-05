@@ -2,37 +2,41 @@ import sublime
 import sublime_plugin
 import os
 import re
-import sys
 import subprocess
 import json
 
 package_name = "Grunt"
+package_url = "https://github.com/tvooo/sublime-grunt"
 
-tasksJSON = re.compile(r'EXPOSE_BEGIN(.*)EXPOSE_END', re.M | re.I | re.DOTALL)
+regex_json = re.compile(r'EXPOSE_BEGIN(.*)EXPOSE_END', re.M | re.I | re.DOTALL)
+
 
 class GruntRunner(object):
     def __init__(self, window):
         self.window = window
-        self.listGruntfiles()
+        self.list_gruntfiles()
 
-    def listTasks(self):
-        tasks = []
+    def list_tasks(self):
         path = settings().get('exec_args').get('path')
         package_path = os.path.join(sublime.packages_path(), package_name)
         args = 'grunt --no-color --tasks "' + package_path + '" expose'
 
-        p = subprocess.Popen( args, stdout=subprocess.PIPE, env={"PATH": path}, cwd=self.wd, shell=True)
-        s = p.communicate()[0]
-        t = tasksJSON.search(s.decode('utf8'))
+        (stdout, stderr) = subprocess.Popen(args, stdout=subprocess.PIPE, env={"PATH": path}, cwd=self.wd, shell=True).communicate()
+        json_match = regex_json.search(stdout.decode('utf8'))
 
-        js = json.loads(t.groups()[0])
-        for k in js.keys():
-            task = js[k]
-            tasks.append([k, task['info'], task['meta']['info']])
+        if json_match is not None:
+            try:
+                json_result = json.loads(json_match.groups()[0])
+            except TypeError:
+                self.write_error("SublimeGrunt: JSON is malformed\n\n" + json_match.groups()[0])
+                sublime.error_message("Could not read available tasks\n")
+            else:
+                return [[name, task['info'], task['meta']['info']] for name, task in json_result.items()]
+        else:
+            self.write_error("SublimeGrunt: Could not expose available tasks\n\n" + stdout)
+            sublime.error_message("Could not expose available tasks\n")
 
-        return tasks
-
-    def listGruntfiles(self):
+    def list_gruntfiles(self):
         self.grunt_files = []
         self.folders = []
         for f in self.window.folders():
@@ -51,8 +55,9 @@ class GruntRunner(object):
 
     def choose_file(self, file):
         self.wd = os.path.dirname(self.grunt_files[file])
-        self.tasks = self.listTasks()
-        self.window.show_quick_panel(self.tasks, self.on_done)
+        self.tasks = self.list_tasks()
+        if self.tasks is not None:
+            self.window.show_quick_panel(self.tasks, self.on_done)
 
     def on_done(self, task):
         if task > -1:
@@ -60,12 +65,22 @@ class GruntRunner(object):
             exec_args.update({'cmd': u"grunt --no-color " + self.tasks[task][0], 'shell': True, 'working_dir': self.wd})
             self.window.run_command("exec", exec_args)
 
+    def write_error(self, message):
+        view = self.window.new_file()
+        edit = view.begin_edit()
+        prefix = "Please file an issue on " + package_url + "/issues and attach this output.\n\n"
+        view.insert(edit, 0, prefix + message)
+        view.end_edit(edit)
+
+
 def settings():
     return sublime.load_settings('SublimeGrunt.sublime-settings')
+
 
 class GruntCommand(sublime_plugin.WindowCommand):
     def run(self):
         GruntRunner(self.window)
+
 
 class GruntKillCommand(sublime_plugin.WindowCommand):
     def run(self):
