@@ -22,7 +22,8 @@ class GruntRunner(object):
         args = 'grunt --no-color --tasks "' + package_path + '" expose'
 
         (stdout, stderr) = subprocess.Popen(args, stdout=subprocess.PIPE, env={"PATH": path}, cwd=self.wd, shell=True).communicate()
-        json_match = regex_json.search(stdout.decode('utf8'))
+        stdout = stdout.decode('utf8')
+        json_match = regex_json.search(stdout)
 
         if json_match is not None:
             try:
