@@ -86,4 +86,3 @@ class GruntErrorCommand(sublime_plugin.TextCommand):
         view = self.view
         prefix = "Please file an issue on " + package_url + "/issues and attach this output.\n\n"
         view.insert(edit, 0, prefix + args["message"])
-        view.end_edit(edit)
