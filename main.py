@@ -29,13 +29,13 @@ class GruntRunner(object):
             try:
                 json_result = json.loads(json_match.groups()[0])
             except TypeError:
-                self.write_error("SublimeGrunt: JSON is malformed\n\n" + json_match.groups()[0])
+                self.window.run_command("grunt_error", {"message": "SublimeGrunt: JSON is malformed\n\n" + json_match.groups()[0]})
                 sublime.error_message("Could not read available tasks\n")
             else:
                 tasks = [[name, task['info'], task['meta']['info']] for name, task in json_result.items()]
                 return sorted(tasks, key=lambda task: task)
         else:
-            self.write_error("SublimeGrunt: Could not expose available tasks\n\n" + stdout)
+            self.window.run_command("grunt_error", {"message": "SublimeGrunt: Could not expose available tasks\n\n" + stdout})
             sublime.error_message("Could not expose available tasks\n")
 
     def list_gruntfiles(self):
@@ -67,13 +67,6 @@ class GruntRunner(object):
             exec_args.update({'cmd': u"grunt --no-color " + self.tasks[task][0], 'shell': True, 'working_dir': self.wd})
             self.window.run_command("exec", exec_args)
 
-    def write_error(self, message):
-        view = self.window.new_file()
-        edit = view.begin_edit()
-        prefix = "Please file an issue on " + package_url + "/issues and attach this output.\n\n"
-        view.insert(edit, 0, prefix + message)
-        view.end_edit(edit)
-
 
 def settings():
     return sublime.load_settings('SublimeGrunt.sublime-settings')
@@ -87,3 +80,10 @@ class GruntCommand(sublime_plugin.WindowCommand):
 class GruntKillCommand(sublime_plugin.WindowCommand):
     def run(self):
         self.window.run_command("exec", {"kill": True})
+
+class GruntErrorCommand(sublime_plugin.TextCommand):
+    def run(self, edit, **args):
+        view = self.view
+        prefix = "Please file an issue on " + package_url + "/issues and attach this output.\n\n"
+        view.insert(edit, 0, prefix + args["message"])
+        view.end_edit(edit)
