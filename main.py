@@ -64,7 +64,7 @@ class GruntRunner(object):
     def on_done(self, task):
         if task > -1:
             exec_args = settings().get('exec_args')
-            exec_args.update({'cmd': u"grunt --no-color " + self.tasks[task][0], 'shell': True, 'working_dir': self.wd})
+            exec_args.update({'cmd': "grunt --no-color " + self.tasks[task][0], 'shell': True, 'working_dir': self.wd})
             self.window.run_command("exec", exec_args)
 
 
