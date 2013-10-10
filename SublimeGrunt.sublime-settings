@@ -1,5 +1,3 @@
 {
-    "exec_args": {
-        "path": "/bin:/usr/bin:/usr/local/bin"
-    }
+    "exec_args": {}
 }

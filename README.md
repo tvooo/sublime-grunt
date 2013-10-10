@@ -18,8 +18,16 @@ As of version 0.2, there is also a command to kill running tasks, for example
 ## Settings
 
 The file `SublimeGrunt.sublime-settings` is used for configuration.
-You may have to add the path to your Node.js installation to the `path`
-variable.
+
+You may override your `PATH` environment variable as follows:
+
+```
+{
+    "exec_args": {
+        "path": "/bin:/usr/bin:/usr/local/bin"
+    }
+}
+```
 
 ## Releases
 
@@ -34,3 +42,4 @@ Thanks for some contributions go to
 * [structAnkit](https://github.com/structAnkit)
 * [lavrton](https://github.com/lavrton)
 * [adamcbrewer](https://github.com/adamcbrewer)
+* [thebjorn](https://github.com/thebjorn)

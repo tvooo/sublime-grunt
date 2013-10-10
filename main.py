@@ -17,25 +17,29 @@ class GruntRunner(object):
         self.list_gruntfiles()
 
     def list_tasks(self):
-        path = settings().get('exec_args').get('path')
+        path = get_env_path()
         package_path = os.path.join(sublime.packages_path(), package_name)
         args = 'grunt --no-color --tasks "' + package_path + '" expose'
 
         (stdout, stderr) = subprocess.Popen(args, stdout=subprocess.PIPE, env={"PATH": path}, cwd=self.wd, shell=True).communicate()
         stdout = stdout.decode('utf8')
+        if stderr:
+            stderr = stderr.decode('utf8')
+        else:
+            stderr = u''
         json_match = regex_json.search(stdout)
 
         if json_match is not None:
             try:
                 json_result = json.loads(json_match.groups()[0])
             except TypeError:
-                self.window.run_command("grunt_error", {"message": "SublimeGrunt: JSON is malformed\n\n" + json_match.groups()[0]})
+                self.window.new_file().run_command("grunt_error", {"message": "SublimeGrunt: JSON is malformed\n\n" + json_match.groups()[0]})
                 sublime.error_message("Could not read available tasks\n")
             else:
                 tasks = [[name, task['info'], task['meta']['info']] for name, task in json_result.items()]
                 return sorted(tasks, key=lambda task: task)
         else:
-            self.window.run_command("grunt_error", {"message": "SublimeGrunt: Could not expose available tasks\n\n" + stdout})
+            self.window.new_file().run_command("grunt_error", {"message": "SublimeGrunt: Could not expose available tasks\n\n" + stdout + "\n\n" + stderr})
             sublime.error_message("Could not expose available tasks\n")
 
     def list_gruntfiles(self):
@@ -63,13 +67,18 @@ class GruntRunner(object):
 
     def on_done(self, task):
         if task > -1:
-            exec_args = settings().get('exec_args')
-            exec_args.update({'cmd': "grunt --no-color " + self.tasks[task][0], 'shell': True, 'working_dir': self.wd})
+            exec_args = {'cmd': "grunt --no-color " + self.tasks[task][0], 'shell': True, 'working_dir': self.wd}
             self.window.run_command("exec", exec_args)
 
 
-def settings():
-    return sublime.load_settings('SublimeGrunt.sublime-settings')
+def get_env_path():
+    path = os.environ['PATH']
+    settings = sublime.load_settings('SublimeGrunt.sublime-settings')
+    if settings:
+        exec_args = settings.get('exec_args')
+        if exec_args:
+            path = exec_args.get('path', os.environ['PATH'])
+    return str(path)
 
 
 class GruntCommand(sublime_plugin.WindowCommand):
