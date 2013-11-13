@@ -21,7 +21,13 @@ class GruntRunner(object):
         package_path = os.path.join(sublime.packages_path(), package_name)
         args = 'grunt --no-color --tasks "' + package_path + '" expose'
 
-        (stdout, stderr) = subprocess.Popen(args, stdout=subprocess.PIPE, env={"PATH": path}, cwd=self.wd, shell=True).communicate()
+        expose = subprocess.Popen(args, stdout=subprocess.PIPE, env={"PATH": path}, cwd=self.wd, shell=True)
+        (stdout, stderr) = expose.communicate()
+
+        if 127 == expose.returncode:
+            sublime.error_message("\"grunt\" command not found.\nPlease add Grunt's location to your PATH.")
+            return
+
         stdout = stdout.decode('utf8')
         if stderr:
             stderr = stderr.decode('utf8')
