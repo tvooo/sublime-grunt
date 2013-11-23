@@ -17,11 +17,11 @@ class GruntRunner(object):
         self.list_gruntfiles()
 
     def list_tasks(self):
-        path = get_env_path()
         package_path = os.path.join(sublime.packages_path(), package_name)
-        args = 'grunt --no-color --tasks "' + package_path + '" expose'
 
-        expose = subprocess.Popen(args, stdout=subprocess.PIPE, env={"PATH": path}, cwd=self.wd, shell=True)
+        args = r'grunt --no-color --tasks "%s" expose' % package_path
+
+        expose = subprocess.Popen(args, stdout=subprocess.PIPE,  env=get_env_with_exec_args_path(), cwd=self.wd, shell=True)
         (stdout, stderr) = expose.communicate()
 
         if 127 == expose.returncode:
@@ -86,6 +86,18 @@ def get_env_path():
         if exec_args:
             path = exec_args.get('path', os.environ['PATH'])
     return str(path)
+
+
+def get_env_with_exec_args_path():
+    env = os.environ.copy()
+    settings = sublime.load_settings('SublimeGrunt.sublime-settings')
+    if settings:
+        exec_args = settings.get('exec_args')        
+        if exec_args:
+            path = str(exec_args.get('path', ''))
+            if path:
+                env['PATH'] = path
+    return env
 
 
 class GruntCommand(sublime_plugin.WindowCommand):
