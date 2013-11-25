@@ -38,6 +38,7 @@ You may override your `PATH` environment variable as follows:
 
 Thanks for some contributions go to
 
+* [VirtueMe](https://github.com/VirtueMe)
 * [antonellopasella](https://github.com/antonellopasella)
 * [structAnkit](https://github.com/structAnkit)
 * [lavrton](https://github.com/lavrton)
