@@ -20,7 +20,14 @@
                                 {
                                     "file": "${packages}/Grunt/SublimeGrunt.sublime-settings"
                                 },
-                                "caption": "Settings"
+                                "caption": "Settings - Default"
+                            },
+                            {
+                                "command": "open_file", "args":
+                                {
+                                    "file": "${packages}/User/SublimeGrunt.sublime-settings"
+                                },
+                                "caption": "Settings - User"
                             }
                         ]
                     }
