@@ -21,7 +21,7 @@ class GruntRunner(object):
 
         args = r'grunt --no-color --tasks "%s" expose' % package_path
 
-        expose = subprocess.Popen(args, stdout=subprocess.PIPE,  env=get_env_with_exec_args_path(), cwd=self.wd, shell=True)
+        expose = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=get_env_with_exec_args_path(), cwd=self.wd, shell=True)
         (stdout, stderr) = expose.communicate()
 
         if 127 == expose.returncode:
