@@ -18,8 +18,8 @@ class GruntRunner(object):
     def list_tasks(self):
         try:
             json_result = self.fetch_json()
-        except TypeError:
-            self.window.new_file().run_command("grunt_error", {"message": "SublimeGrunt: JSON is malformed\n\n"})
+        except TypeError as e:
+            self.window.new_file().run_command("grunt_error", {"message": "SublimeGrunt: JSON is malformed\n\n%s\n\n" % e})
             sublime.error_message("Could not read available tasks\n")
         else:
             tasks = [[name, task['info'], task['meta']['info']] for name, task in json_result.items()]
@@ -88,17 +88,13 @@ class GruntRunner(object):
             self.window.run_command("exec", exec_args)
 
 
-def hashfile(filepath):
-    f = open(filepath, 'rb')
-
-    try:
+def hashfile(filename):
+    with open(filename, mode='rb') as f:
         filehash = sha1()
-        content = f.read()
-        filehash.update("blob " + str(len(content)) + "\0")
+        content = f.read();
+        filehash.update(str.encode("blob " + str(len(content)) + "\0"))
         filehash.update(content)
         return filehash.hexdigest()
-    finally:
-        f.close()
 
 
 def get_env_path():
