@@ -17,6 +17,7 @@ class GruntRunner(object):
 
     def list_tasks(self):
         try:
+            self.callcount = 0
             json_result = self.fetch_json()
         except TypeError as e:
             self.window.new_file().run_command("grunt_error", {"message": "SublimeGrunt: JSON is malformed\n\n%s\n\n" % e})
@@ -55,8 +56,15 @@ class GruntRunner(object):
                     return data[gruntfile]["tasks"]
            finally:
                json_data.close()
+        self.callcount += 1
 
-        return self.run_expose()
+        if self.callcount == 1: 
+            return self.run_expose()
+
+        if data is None:
+            raise TypeError("Could not expose gruntfile")
+
+        raise TypeError("Sha1 from grunt expose ({0}) is not equal to calculated ({1})".format(data[gruntfile]["sha1"], filesha1))
 
     def list_gruntfiles(self):
         self.grunt_files = []
@@ -92,7 +100,7 @@ def hashfile(filename):
     with open(filename, mode='rb') as f:
         filehash = sha1()
         content = f.read();
-        filehash.update(str.encode("blob " + str(len(content)) + "\0"))
+        filehash.update(str("blob " + str(len(content)) + "\0").encode('ascii'))
         filehash.update(content)
         return filehash.hexdigest()
 
