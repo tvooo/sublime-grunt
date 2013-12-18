@@ -1,4 +1,5 @@
-var path = require('path');
+var path = require('path'),
+    fs = require('fs');
 var crypto = require('crypto'),
     shasum = crypto.createHash('sha1');
 
@@ -8,9 +9,9 @@ module.exports = function(grunt) {
   var _ = grunt.util._;
 
   function generatesha1(filename) {
-      var content = grunt.file.read(filename);
+       var content = fs.readFileSync(filename);
  
-      shasum.update("blob " + content.length + '\0');
+      shasum.update("blob " + content.length + '\0', 'utf8');
       shasum.update(content);
 
       return shasum.digest('hex');
