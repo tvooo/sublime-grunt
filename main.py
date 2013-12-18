@@ -100,7 +100,7 @@ def hashfile(filename):
     with open(filename, mode='rb') as f:
         filehash = sha1()
         content = f.read();
-        filehash.update(str("blob " + str(len(content)) + "\0").encode('ascii'))
+        filehash.update(str("blob " + str(len(content)) + "\0").encode('UTF-8'))
         filehash.update(content)
         return filehash.hexdigest()
 
