@@ -47,7 +47,7 @@ class GruntRunner(object):
         if os.path.exists(jsonfilename):
            filesha1 = hashfile(gruntfile)
 
-           json_data=open(jsonfilename)
+           json_data=open(jsonfilename, encoding="utf-8")
 
            try:
                 data = json.load(json_data)
