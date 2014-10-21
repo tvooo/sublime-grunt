@@ -89,7 +89,8 @@ class GruntRunner(object):
 
         self.tasks = self.list_tasks()
         if self.tasks is not None:
-            self.window.show_quick_panel(self.tasks, self.on_done)
+            #fix quick panel unavailable
+            sublime.set_timeout(lambda:  self.window.show_quick_panel(self.tasks, self.on_done), 1)
 
     def on_done(self, task):
         if task > -1:
