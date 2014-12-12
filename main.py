@@ -66,10 +66,13 @@ class GruntRunner(object):
         raise TypeError("Sha1 from grunt expose ({0}) is not equal to calculated ({1})".format(data[self.chosen_gruntfile]["sha1"], filesha1))
 
     def list_gruntfiles(self):
+        # Load gruntfile paths from config
+        self.folders = get_grunt_file_paths()
         self.grunt_files = []
-        self.folders = []
         for f in self.window.folders():
             self.folders.append(f)
+
+        for f in self.folders:
             if os.path.exists(os.path.join(f, "Gruntfile.js")):
                 self.grunt_files.append(os.path.join(f, "Gruntfile.js"))
             elif os.path.exists(os.path.join(f, "Gruntfile.coffee")):
@@ -115,6 +118,16 @@ def get_env_path():
         if exec_args:
             path = exec_args.get('path', os.environ['PATH'])
     return str(path)
+
+
+def get_grunt_file_paths():
+    # Get the user settings
+    global_settings = sublime.load_settings('SublimeGrunt.sublime-settings')
+    # Check the settings for the current project
+    # If there is a setting for the paths in the project, it takes precidence
+    # No setting in the project, then use the global one
+    # If there is no global one, then use a default
+    return sublime.active_window().active_view().settings().get('SublimeGrunt', {}).get('gruntfile_paths', global_settings.get('gruntfile_paths', []))
 
 
 def get_env_with_exec_args_path():

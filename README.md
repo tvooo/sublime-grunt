@@ -36,6 +36,14 @@ You may override your `PATH` environment variable as follows:
     }
 }
 ```
+If your GruntFile is not in the base path of the project, then you can add the path(s) to check as follows:
+
+```
+{
+    "gruntfile_paths": ["/path", "/another/path", "/one/final/path"]
+}
+```
+Alternatively this could be set per-project in your .sublime-project settings object
 
 ## Releases
 
